@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ImageSearch</string>
+    <string name="search">Search</string>
+    <string name="search_icon">Search Icon</string>
+    <string name="close_icon">Close Icon</string>
+    <string name="history_icon">History Icon</string>
+
+    <string name="loading_failed">Failed to load</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading</string>
+    <string name="mars_photo">Mars photo</string>
+
+</resources>
