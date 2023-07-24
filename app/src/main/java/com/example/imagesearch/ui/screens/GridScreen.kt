@@ -23,13 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.imagesearch.R
 import com.example.imagesearch.model.Photo
-import com.example.imagesearch.ui.theme.ImageSearchTheme
 
 
 @Composable
@@ -41,6 +39,7 @@ fun GridScreen(
         is PhotoUiState.Success -> GridResult(
             photoUiState.photos, modifier = modifier.fillMaxWidth()
         )
+
         is PhotoUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
 }
@@ -63,6 +62,7 @@ fun GridResult(photos: List<Photo>, modifier: Modifier = Modifier) {
         }
     }
 }
+
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
     Image(
@@ -99,27 +99,16 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        Column{
+        Column {
             AsyncImage(
-                model = ImageRequest.Builder(context = LocalContext.current).data(photo.imgSrc)
+                model = ImageRequest.Builder(context = LocalContext.current).data(photo.previewURL)
                     .crossfade(true).build(),
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
-                contentDescription = photo.id,
+                contentDescription = photo.tags,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CardPreview() {
-    ImageSearchTheme {
-        Column(Modifier.padding(vertical = 16.dp)) {
-            val mockData = List(10) { Photo("$it", "") }
-            GridResult(photos = mockData)
         }
     }
 }

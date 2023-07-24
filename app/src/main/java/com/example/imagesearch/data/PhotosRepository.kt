@@ -7,6 +7,10 @@ interface PhotosRepository {
     suspend fun getPhotos(): List<Photo>
 }
 
-class DefaultPhotosRepository(private val photoApiService : PhotoApiService) : PhotosRepository {
-    override suspend fun getPhotos(): List<Photo>  = photoApiService.getPhotos()
+class DefaultPhotosRepository(
+    private val searchString: String,
+    private val photoApiService: PhotoApiService
+) : PhotosRepository {
+    override suspend fun getPhotos(): List<Photo> =
+        photoApiService.getPhotos(searchString = searchString).hits
 }

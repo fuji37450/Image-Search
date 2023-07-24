@@ -22,42 +22,42 @@ sealed interface PhotoUiState {
     object Loading : PhotoUiState
 }
 
-class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel()  {
-        /** The mutable State that stores the status of the most recent request */
-        var photoUiState: PhotoUiState by mutableStateOf(PhotoUiState.Loading)
+class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel() {
+    /** The mutable State that stores the status of the most recent request */
+    var photoUiState: PhotoUiState by mutableStateOf(PhotoUiState.Loading)
         private set
 
-                init {
-                    getPhotos()
-                }
+    init {
+        getPhotos()
+    }
 
-        /**
-         * Gets Mars photos information from the Mars API Retrofit service and updates the
-         * [Photo] [List] [MutableList].
-         */
-        fun getPhotos() {
-            viewModelScope.launch {
-                photoUiState = PhotoUiState.Loading
-                photoUiState = try {
-                    PhotoUiState.Success(photosRepository.getPhotos())
-                } catch (e: IOException) {
-                    PhotoUiState.Error
-                } catch (e: HttpException) {
-                    PhotoUiState.Error
-                }
-            }
-        }
-
-        /**
-         * Factory for [PhotoViewModel] that takes [PhotosRepository] as a dependency
-         */
-        companion object {
-            val Factory: ViewModelProvider.Factory = viewModelFactory {
-                initializer {
-                    val application = (this[APPLICATION_KEY] as PhotosApplication)
-                    val photosRepository = application.container.photosRepository
-                    PhotoViewModel(photosRepository = photosRepository)
-                }
+    /**
+     * Gets Mars photos information from the Mars API Retrofit service and updates the
+     * [Photo] [List] [MutableList].
+     */
+    fun getPhotos() {
+        viewModelScope.launch {
+            photoUiState = PhotoUiState.Loading
+            photoUiState = try {
+                PhotoUiState.Success(photosRepository.getPhotos())
+            } catch (e: IOException) {
+                PhotoUiState.Error
+            } catch (e: HttpException) {
+                PhotoUiState.Error
             }
         }
     }
+
+    /**
+     * Factory for [PhotoViewModel] that takes [PhotosRepository] as a dependency
+     */
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as PhotosApplication)
+                val photosRepository = application.container.photosRepository
+                PhotoViewModel(photosRepository = photosRepository)
+            }
+        }
+    }
+}

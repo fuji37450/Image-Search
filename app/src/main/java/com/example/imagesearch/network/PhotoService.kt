@@ -1,10 +1,14 @@
 package com.example.imagesearch.network
 
-import com.example.imagesearch.model.Photo
+import com.example.imagesearch.model.PhotoData
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 
 interface PhotoApiService {
-    @GET("photos")
-    suspend fun getPhotos(): List<Photo>
+    @GET("api")
+    suspend fun getPhotos(
+        @Query("key") apiKey: String = "38433874-7c8291405628f5642ed3a07ab",
+        @Query("q") searchString: String,
+    ): PhotoData
 }
