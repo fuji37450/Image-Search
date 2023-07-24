@@ -1,7 +1,5 @@
 package com.example.imagesearch.ui
 
-//import com.example.imagesearch.HomeScreen
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,83 +41,78 @@ fun ImageResearchApp() {
                 .fillMaxSize()
                 .padding(it)
         ) {
-            SearchBox()
-            GridScreen(photoUiState = photoViewModel.photoUiState, retryAction = photoViewModel::getPhotos)
-//            val marsViewModel: MarsViewModel =
-//                viewModel(factory = MarsViewModel.Factory)
-//            HomeScreen(
-//                marsUiState = marsViewModel.marsUiState,
-//                retryAction = marsViewModel::getMarsPhotos
-//            )
+            Column() {
+                SearchBox()
+                GridScreen(
+                    photoUiState = photoViewModel.photoUiState,
+                    retryAction = photoViewModel::getPhotos
+                )
+            }
         }
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBox(modifier: Modifier = Modifier) {
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     var histories = remember { mutableStateListOf<String>() }
-    Scaffold {
-        SearchBar(
-            modifier = Modifier.fillMaxWidth(),
-            query = text,
-            onQueryChange = {
-                text = it
-            },
-            onSearch = {
-                histories.add(0, text)
-                if (histories.size > 10) {
-                    histories.removeLast()
-                }
-                text = ""
-                active = false
-            },
-            active = active,
-            onActiveChange = {
-                active = it
-            },
-            placeholder = {
-                Text(text = stringResource(R.string.search))
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = stringResource(R.string.search_icon)
-                )
-            },
-            trailingIcon = {
-                if (active) {
-                    Icon(
-                        modifier = Modifier.clickable {
-                            if (text.isNotEmpty()) {
-                                text = ""
-                            } else {
-                                active = false
-                            }
-                        },
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.close_icon)
-                    )
-                }
+    SearchBar(
+        modifier = Modifier.fillMaxWidth(),
+        query = text,
+        onQueryChange = {
+            text = it
+        },
+        onSearch = {
+            histories.add(0, text)
+            if (histories.size > 10) {
+                histories.removeLast()
             }
-        ) {
-            histories.forEach {
-                Row(modifier = Modifier) {
-                    Icon(
-                        modifier = Modifier.padding(end = 10.dp),
-                        imageVector = Icons.Filled.History,
-                        contentDescription = stringResource(R.string.history_icon)
-                    )
-                    Text(text = it)
-                }
+            text = ""
+            active = false
+        },
+        active = active,
+        onActiveChange = {
+            active = it
+        },
+        placeholder = {
+            Text(text = stringResource(R.string.search))
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = stringResource(R.string.search_icon)
+            )
+        },
+        trailingIcon = {
+            if (active) {
+                Icon(
+                    modifier = Modifier.clickable {
+                        if (text.isNotEmpty()) {
+                            text = ""
+                        } else {
+                            active = false
+                        }
+                    },
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.close_icon)
+                )
+            }
+        }
+    ) {
+        histories.forEach {
+            Row(modifier = Modifier) {
+                Icon(
+                    modifier = Modifier.padding(end = 10.dp),
+                    imageVector = Icons.Filled.History,
+                    contentDescription = stringResource(R.string.history_icon)
+                )
+                Text(text = it)
             }
         }
     }
 }
-
 
 
 @Preview(showBackground = true)
