@@ -25,6 +25,6 @@ class DefaultAppContainer : AppContainer {
     }
 
     override val photosRepository: PhotosRepository by lazy {
-        DefaultPhotosRepository("fuji", retrofitService)
+        DefaultPhotosRepository(retrofitService)
     }
 }

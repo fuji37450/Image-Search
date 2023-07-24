@@ -28,18 +28,18 @@ class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel
         private set
 
     init {
-        getPhotos()
+//        getPhotos()
     }
 
     /**
-     * Gets Mars photos information from the Mars API Retrofit service and updates the
+     * Gets photos information from the pixabay API Retrofit service and updates the
      * [Photo] [List] [MutableList].
      */
-    fun getPhotos() {
+    fun getPhotos(searchString: String) {
         viewModelScope.launch {
             photoUiState = PhotoUiState.Loading
             photoUiState = try {
-                PhotoUiState.Success(photosRepository.getPhotos())
+                PhotoUiState.Success(photosRepository.getPhotos(searchString))
             } catch (e: IOException) {
                 PhotoUiState.Error
             } catch (e: HttpException) {
