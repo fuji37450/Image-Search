@@ -34,18 +34,17 @@ import com.example.imagesearch.ui.theme.ImageSearchTheme
 
 @Composable
 fun ImageResearchApp() {
-    Scaffold() {
-        val photoViewModel: PhotoViewModel = viewModel(factory = PhotoViewModel.Factory)
+    val photoViewModel: PhotoViewModel = viewModel(factory = PhotoViewModel.Factory)
+    Scaffold {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
-            Column() {
+            Column {
                 SearchBox()
                 GridScreen(
-                    photoUiState = photoViewModel.photoUiState,
-                    retryAction = photoViewModel::getPhotos
+                    photoUiState = photoViewModel.photoUiState
                 )
             }
         }
@@ -57,7 +56,8 @@ fun ImageResearchApp() {
 fun SearchBox(modifier: Modifier = Modifier) {
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
-    var histories = remember { mutableStateListOf<String>() }
+    val histories = remember { mutableStateListOf<String>() }
+    val photoViewModel: PhotoViewModel = viewModel(factory = PhotoViewModel.Factory)
     SearchBar(
         modifier = Modifier.fillMaxWidth(),
         query = text,
@@ -69,6 +69,7 @@ fun SearchBox(modifier: Modifier = Modifier) {
             if (histories.size > 10) {
                 histories.removeLast()
             }
+            photoViewModel.getPhotos(text)
             text = ""
             active = false
         },
