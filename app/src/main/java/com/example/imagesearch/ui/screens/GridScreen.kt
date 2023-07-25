@@ -15,17 +15,32 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -39,11 +54,30 @@ fun GridScreen(
 ) {
     when (photoUiState) {
         is PhotoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is PhotoUiState.Success -> ListResult(
-            photoUiState.photos, modifier = modifier.fillMaxWidth()
+        is PhotoUiState.Success -> SearchResultScreen(
+            photoUiState.photos,
+            modifier = modifier.fillMaxWidth()
         )
 
         is PhotoUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
+    }
+}
+
+@Composable
+fun SearchResultScreen(photos: List<Photo>, modifier: Modifier) {
+    Column {
+        var isGridMode by remember { mutableStateOf(true) }
+        ResultInfo(
+            isGridMode,
+            onCheckedChange = { modeState -> isGridMode = modeState },
+            resultCount = photos.count(),
+            searchText = "temp"
+        )
+        if (isGridMode) {
+            GridResult(photos = photos, modifier)
+        } else {
+            ListResult(photos = photos, modifier)
+        }
     }
 }
 
@@ -140,6 +174,42 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
                 contentDescription = photo.tags,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+fun ResultInfo(
+    isGridMode: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    resultCount: Int,
+    searchText: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(buildAnnotatedString {
+            append("Found ")
+            withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
+                append("$resultCount")
+            }
+            append(" result for ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(searchText)
+            }
+            append(":")
+        })
+        IconToggleButton(
+            checked = isGridMode,
+            onCheckedChange = { modeState -> onCheckedChange(modeState) },
+        ) {
+            Icon(
+                imageVector = if (isGridMode) Icons.Outlined.ViewList else Icons.Outlined.GridView,
+                contentDescription = stringResource(R.string.list_icon)
             )
         }
     }

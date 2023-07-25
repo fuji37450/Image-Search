@@ -1,7 +1,6 @@
 package com.example.imagesearch.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,11 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
@@ -26,20 +22,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.imagesearch.R
 import com.example.imagesearch.ui.screens.GridScreen
-import com.example.imagesearch.ui.screens.PhotoUiState
 import com.example.imagesearch.ui.screens.PhotoViewModel
 import com.example.imagesearch.ui.theme.ImageSearchTheme
 
@@ -58,51 +47,8 @@ fun ImageResearchApp() {
                     .fillMaxSize(),
             ) {
                 SearchBox()
-                ResultRow(photoUiState = photoViewModel.photoUiState)
                 GridScreen(photoUiState = photoViewModel.photoUiState)
             }
-        }
-    }
-}
-
-@Composable
-fun ResultRow(photoUiState: PhotoUiState) {
-    when (photoUiState) {
-        is PhotoUiState.Loading -> Text("Searching...")
-        is PhotoUiState.Success -> ResultInfo(photoUiState.photos.count(), "tt")
-        is PhotoUiState.Error -> Text("Some error occurred")
-    }
-}
-
-@Composable
-fun ResultInfo(resultCount: Int, searchText: String, modifier: Modifier = Modifier) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        var isGridMode by remember { mutableStateOf(true) }
-        Text(buildAnnotatedString {
-            append("Found ")
-            withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
-                append("$resultCount")
-            }
-            append(" result for ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append("$searchText")
-            }
-            append(":")
-        })
-        IconToggleButton(
-            checked = isGridMode,
-            onCheckedChange = {
-                isGridMode = !isGridMode
-            },
-        ) {
-            Icon(
-                imageVector = if (isGridMode) Icons.Outlined.GridView else Icons.Outlined.ViewList,
-                contentDescription = stringResource(R.string.list_icon)
-            )
         }
     }
 }
