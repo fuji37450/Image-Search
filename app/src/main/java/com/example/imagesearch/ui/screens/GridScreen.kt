@@ -14,7 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.ViewList
@@ -38,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -70,7 +69,6 @@ fun SearchResultScreen(photos: List<Photo>, modifier: Modifier) {
         ResultInfo(
             isGridMode,
             onCheckedChange = { modeState -> isGridMode = modeState },
-            resultCount = photos.count(),
             searchText = "temp"
         )
         if (isGridMode) {
@@ -103,14 +101,13 @@ fun GridResult(photos: List<Photo>, modifier: Modifier = Modifier) {
 @Composable
 fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
     LazyColumn(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
-        items(photos, key = { photo -> photo.id }) { photo ->
+        itemsIndexed(photos, key = { _, photo -> photo.id }) { index, photo ->
             Row(
                 modifier = modifier
                     .fillMaxWidth()
+                    .padding(4.dp)
                     .size(100.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -123,11 +120,13 @@ fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
                     placeholder = painterResource(R.drawable.loading_img),
                     contentDescription = photo.tags,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.aspectRatio(16f / 9f)
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .aspectRatio(16f / 9f)
                 )
-                Text(text = photo.tags)
+                Text(modifier = modifier.padding(4.dp), text = photo.tags)
             }
-            Divider()
+            if (index < photos.lastIndex) Divider()
         }
     }
 }
@@ -183,7 +182,6 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
 fun ResultInfo(
     isGridMode: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    resultCount: Int,
     searchText: String,
     modifier: Modifier = Modifier
 ) {
@@ -193,11 +191,7 @@ fun ResultInfo(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(buildAnnotatedString {
-            append("Found ")
-            withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
-                append("$resultCount")
-            }
-            append(" result for ")
+            append("Results for ")
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                 append(searchText)
             }
