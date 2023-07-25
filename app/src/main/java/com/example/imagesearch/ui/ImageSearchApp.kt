@@ -110,6 +110,13 @@ fun SearchBox(modifier: Modifier = Modifier) {
         histories.forEach {
             Row(
                 modifier = Modifier
+                    .clickable(onClick = {
+                        text = ""
+                        active = false
+                        photoViewModel.getPhotos(it)
+                        histories.remove(it)
+                        histories.add(0, it)
+                    })
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .size(40.dp),
