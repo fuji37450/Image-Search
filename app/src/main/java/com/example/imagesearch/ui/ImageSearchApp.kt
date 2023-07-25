@@ -41,11 +41,13 @@ fun ImageResearchApp() {
                 .fillMaxSize()
                 .padding(it)
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .padding(all = 12.dp)
+                    .fillMaxSize(),
+            ) {
                 SearchBox()
-                GridScreen(
-                    photoUiState = photoViewModel.photoUiState
-                )
+                GridScreen(photoUiState = photoViewModel.photoUiState)
             }
         }
     }
@@ -114,7 +116,6 @@ fun SearchBox(modifier: Modifier = Modifier) {
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
