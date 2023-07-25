@@ -4,16 +4,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +39,7 @@ fun GridScreen(
 ) {
     when (photoUiState) {
         is PhotoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is PhotoUiState.Success -> GridResult(
+        is PhotoUiState.Success -> ListResult(
             photoUiState.photos, modifier = modifier.fillMaxWidth()
         )
 
@@ -58,6 +62,38 @@ fun GridResult(photos: List<Photo>, modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .aspectRatio(1.5f)
             )
+        }
+    }
+}
+
+@Composable
+fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        items(photos, key = { photo -> photo.id }) { photo ->
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .size(100.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context = LocalContext.current)
+                        .data(photo.previewURL)
+                        .crossfade(true).build(),
+                    error = painterResource(R.drawable.ic_broken_image),
+                    placeholder = painterResource(R.drawable.loading_img),
+                    contentDescription = photo.tags,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.aspectRatio(16f / 9f)
+                )
+                Text(text = photo.tags)
+            }
+            Divider()
         }
     }
 }
