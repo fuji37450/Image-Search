@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.NorthWest
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,6 +24,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -105,13 +108,28 @@ fun SearchBox(modifier: Modifier = Modifier) {
         }
     ) {
         histories.forEach {
-            Row(modifier = Modifier) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .size(40.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
-                    modifier = Modifier.padding(end = 10.dp),
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .weight(1f),
                     imageVector = Icons.Filled.History,
                     contentDescription = stringResource(R.string.history_icon)
                 )
-                Text(text = it)
+                Text(modifier = Modifier.weight(8f), text = it)
+                Icon(
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .weight(1f),
+                    imageVector = Icons.Filled.NorthWest,
+                    contentDescription = stringResource(R.string.history_icon)
+                )
             }
         }
     }
