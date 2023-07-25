@@ -1,20 +1,22 @@
 package com.example.imagesearch.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.ViewList
@@ -32,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -79,23 +82,24 @@ fun SearchResultScreen(photos: List<Photo>, modifier: Modifier) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GridResult(photos: List<Photo>, modifier: Modifier = Modifier) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(150.dp),
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(150.dp),
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(4.dp)
-    ) {
-        items(items = photos, key = { photo -> photo.id }) { photo ->
-            PhotoCard(
-                photo = photo,
-                modifier = modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
-                    .aspectRatio(1.5f)
-            )
+        verticalItemSpacing = 8.dp,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        content = {
+            items(photos, key = { photo -> photo.id }) { photo ->
+                PhotoCard(
+                    photo = photo, modifier = modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                )
+            }
         }
-    }
+    )
 }
 
 @Composable
@@ -122,6 +126,7 @@ fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .padding(4.dp)
+                        .clip(RoundedCornerShape(8.dp))
                         .aspectRatio(16f / 9f)
                 )
                 Text(modifier = modifier.padding(4.dp), text = photo.tags)
@@ -140,9 +145,6 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
     )
 }
 
-/**
- * The home screen displaying error message with re-attempt button.
- */
 @Composable
 fun ErrorScreen(modifier: Modifier = Modifier) {
     Column(
@@ -174,6 +176,7 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
+            Text(modifier = modifier.padding(12.dp), text = photo.tags)
         }
     }
 }
@@ -186,7 +189,7 @@ fun ResultInfo(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
