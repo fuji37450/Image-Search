@@ -1,25 +1,29 @@
 package com.example.imagesearch.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
@@ -32,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,6 +57,8 @@ fun GridScreen(
     photoUiState: PhotoUiState, modifier: Modifier = Modifier
 ) {
     when (photoUiState) {
+        is PhotoUiState.Init -> InitScreen(modifier = modifier.fillMaxSize())
+        is PhotoUiState.Empty -> EmptyScreen("temp", modifier = modifier.fillMaxSize())
         is PhotoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is PhotoUiState.Success -> SearchResultScreen(
             photoUiState.photos,
@@ -79,23 +86,24 @@ fun SearchResultScreen(photos: List<Photo>, modifier: Modifier) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GridResult(photos: List<Photo>, modifier: Modifier = Modifier) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(150.dp),
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(150.dp),
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(4.dp)
-    ) {
-        items(items = photos, key = { photo -> photo.id }) { photo ->
-            PhotoCard(
-                photo = photo,
-                modifier = modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
-                    .aspectRatio(1.5f)
-            )
+        verticalItemSpacing = 8.dp,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        content = {
+            items(photos, key = { photo -> photo.id }) { photo ->
+                PhotoCard(
+                    photo = photo, modifier = modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                )
+            }
         }
-    }
+    )
 }
 
 @Composable
@@ -116,12 +124,13 @@ fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
                     model = ImageRequest.Builder(context = LocalContext.current)
                         .data(photo.previewURL)
                         .crossfade(true).build(),
-                    error = painterResource(R.drawable.ic_broken_image),
+                    error = painterResource(R.drawable.broken_img),
                     placeholder = painterResource(R.drawable.loading_img),
                     contentDescription = photo.tags,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .padding(4.dp)
+                        .clip(RoundedCornerShape(8.dp))
                         .aspectRatio(16f / 9f)
                 )
                 Text(modifier = modifier.padding(4.dp), text = photo.tags)
@@ -132,17 +141,49 @@ fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
-    Image(
-        modifier = modifier.size(200.dp),
-        painter = painterResource(R.drawable.loading_img),
-        contentDescription = ""
-    )
+fun InitScreen(modifier: Modifier) {
+    Column(
+        modifier = modifier.padding(12.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Filled.ImageSearch,
+            contentDescription = stringResource(R.string.image_search_icon),
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(80.dp)
+        )
+        Text(text = "Type something to search")
+    }
 }
 
-/**
- * The home screen displaying error message with re-attempt button.
- */
+@Composable
+fun EmptyScreen(searchText: String, modifier: Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(buildAnnotatedString {
+            append("No result found for ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(searchText)
+            }
+        })
+    }
+}
+
+@Composable
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
 @Composable
 fun ErrorScreen(modifier: Modifier = Modifier) {
     Column(
@@ -151,7 +192,7 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
+            painter = painterResource(id = R.drawable.connection_error_img), contentDescription = ""
         )
         Text(text = "失敗", modifier = Modifier.padding(16.dp))
     }
@@ -168,12 +209,13 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
             AsyncImage(
                 model = ImageRequest.Builder(context = LocalContext.current).data(photo.previewURL)
                     .crossfade(true).build(),
-                error = painterResource(R.drawable.ic_broken_image),
+                error = painterResource(R.drawable.broken_img),
                 placeholder = painterResource(R.drawable.loading_img),
                 contentDescription = photo.tags,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
+            Text(modifier = modifier.padding(12.dp), text = photo.tags)
         }
     }
 }
@@ -186,7 +228,7 @@ fun ResultInfo(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
