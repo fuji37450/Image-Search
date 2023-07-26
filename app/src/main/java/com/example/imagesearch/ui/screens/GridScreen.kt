@@ -54,13 +54,18 @@ import com.example.imagesearch.model.Photo
 
 @Composable
 fun GridScreen(
-    photoUiState: PhotoUiState, modifier: Modifier = Modifier
+    searchText: String, photoUiState: PhotoUiState, modifier: Modifier = Modifier
 ) {
     when (photoUiState) {
         is PhotoUiState.Init -> InitScreen(modifier = modifier.fillMaxSize())
-        is PhotoUiState.Empty -> EmptyScreen("temp", modifier = modifier.fillMaxSize())
+        is PhotoUiState.Empty -> EmptyScreen(
+            searchText,
+            modifier = modifier.fillMaxSize()
+        )
+
         is PhotoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is PhotoUiState.Success -> SearchResultScreen(
+            searchText,
             photoUiState.photos,
             modifier = modifier.fillMaxWidth()
         )
@@ -70,13 +75,13 @@ fun GridScreen(
 }
 
 @Composable
-fun SearchResultScreen(photos: List<Photo>, modifier: Modifier) {
+fun SearchResultScreen(searchText: String, photos: List<Photo>, modifier: Modifier) {
     Column {
         var isGridMode by remember { mutableStateOf(true) }
         ResultInfo(
             isGridMode,
             onCheckedChange = { modeState -> isGridMode = modeState },
-            searchText = "temp"
+            searchText = searchText
         )
         if (isGridMode) {
             GridResult(photos = photos, modifier)

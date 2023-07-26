@@ -27,13 +27,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.imagesearch.R
 import com.example.imagesearch.ui.screens.GridScreen
 import com.example.imagesearch.ui.screens.PhotoViewModel
-import com.example.imagesearch.ui.theme.ImageSearchTheme
 
 @Composable
 fun ImageResearchApp() {
@@ -50,7 +48,7 @@ fun ImageResearchApp() {
                     .fillMaxSize(),
             ) {
                 SearchBox()
-                GridScreen(photoUiState = photoViewModel.photoUiState)
+                GridScreen(photoViewModel.searchText, photoViewModel.photoUiState)
             }
         }
     }
@@ -74,6 +72,7 @@ fun SearchBox(modifier: Modifier = Modifier) {
             if (histories.size > 10) {
                 histories.removeLast()
             }
+            photoViewModel.searchText = text
             photoViewModel.getPhotos(text)
             text = ""
             active = false
@@ -110,13 +109,14 @@ fun SearchBox(modifier: Modifier = Modifier) {
         histories.forEach {
             Row(
                 modifier = Modifier
-                    .clickable(onClick = {
+                    .clickable {
                         text = ""
                         active = false
+                        photoViewModel.searchText = it
                         photoViewModel.getPhotos(it)
                         histories.remove(it)
                         histories.add(0, it)
-                    })
+                    }
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
                     .size(40.dp),
@@ -138,16 +138,6 @@ fun SearchBox(modifier: Modifier = Modifier) {
                     contentDescription = stringResource(R.string.history_icon)
                 )
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SearchPreview() {
-    ImageSearchTheme {
-        Column(Modifier.padding(vertical = 16.dp)) {
-            SearchBox()
         }
     }
 }
