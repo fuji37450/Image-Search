@@ -30,11 +30,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.imagesearch.R
-import com.example.imagesearch.ui.screens.GridScreen
 import com.example.imagesearch.ui.screens.PhotoViewModel
+import com.example.imagesearch.ui.screens.SearchResultScreen
 
 @Composable
-fun ImageResearchApp() {
+fun ImageSearchApp() {
     val photoViewModel: PhotoViewModel = viewModel(factory = PhotoViewModel.Factory)
     Scaffold {
         Surface(
@@ -48,7 +48,7 @@ fun ImageResearchApp() {
                     .fillMaxSize(),
             ) {
                 SearchBox()
-                GridScreen(photoViewModel.searchText, photoViewModel.photoUiState)
+                SearchResultScreen(photoViewModel.searchText, photoViewModel.photoUiState)
             }
         }
     }
@@ -135,7 +135,7 @@ fun SearchBox(modifier: Modifier = Modifier) {
                         .padding(start = 10.dp)
                         .weight(1f),
                     imageVector = Icons.Filled.NorthWest,
-                    contentDescription = stringResource(R.string.history_icon)
+                    contentDescription = stringResource(R.string.north_west_icon)
                 )
             }
         }

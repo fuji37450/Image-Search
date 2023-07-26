@@ -11,5 +11,7 @@
     <string name="mars_photo">Mars photo</string>
     <string name="list_icon">List Icon</string>
     <string name="image_search_icon">image_search_icon</string>
+    <string name="north_west_icon">north_west_icon</string>
+    <string name="cloud_off_icon">cloud_off_icon</string>
 
 </resources>
