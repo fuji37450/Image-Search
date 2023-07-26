@@ -18,10 +18,12 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
@@ -55,6 +57,8 @@ fun GridScreen(
     photoUiState: PhotoUiState, modifier: Modifier = Modifier
 ) {
     when (photoUiState) {
+        is PhotoUiState.Init -> InitScreen(modifier = modifier.fillMaxSize())
+        is PhotoUiState.Empty -> EmptyScreen("temp", modifier = modifier.fillMaxSize())
         is PhotoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is PhotoUiState.Success -> SearchResultScreen(
             photoUiState.photos,
@@ -120,7 +124,7 @@ fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
                     model = ImageRequest.Builder(context = LocalContext.current)
                         .data(photo.previewURL)
                         .crossfade(true).build(),
-                    error = painterResource(R.drawable.ic_broken_image),
+                    error = painterResource(R.drawable.broken_img),
                     placeholder = painterResource(R.drawable.loading_img),
                     contentDescription = photo.tags,
                     contentScale = ContentScale.Crop,
@@ -137,12 +141,47 @@ fun ListResult(photos: List<Photo>, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun InitScreen(modifier: Modifier) {
+    Column(
+        modifier = modifier.padding(12.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Filled.ImageSearch,
+            contentDescription = stringResource(R.string.image_search_icon),
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(80.dp)
+        )
+        Text(text = "Type something to search")
+    }
+}
+
+@Composable
+fun EmptyScreen(searchText: String, modifier: Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(buildAnnotatedString {
+            append("No result found for ")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(searchText)
+            }
+        })
+    }
+}
+
+@Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
-    Image(
-        modifier = modifier.size(200.dp),
-        painter = painterResource(R.drawable.loading_img),
-        contentDescription = ""
-    )
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+    }
 }
 
 @Composable
@@ -153,7 +192,7 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
+            painter = painterResource(id = R.drawable.connection_error_img), contentDescription = ""
         )
         Text(text = "失敗", modifier = Modifier.padding(16.dp))
     }
@@ -170,7 +209,7 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
             AsyncImage(
                 model = ImageRequest.Builder(context = LocalContext.current).data(photo.previewURL)
                     .crossfade(true).build(),
-                error = painterResource(R.drawable.ic_broken_image),
+                error = painterResource(R.drawable.broken_img),
                 placeholder = painterResource(R.drawable.loading_img),
                 contentDescription = photo.tags,
                 contentScale = ContentScale.Crop,
