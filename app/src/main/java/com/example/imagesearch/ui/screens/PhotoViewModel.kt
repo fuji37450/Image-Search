@@ -26,6 +26,7 @@ sealed interface PhotoUiState {
 
 class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel() {
     var searchText: String by mutableStateOf("")
+        private set
     var photoUiState: PhotoUiState by mutableStateOf(PhotoUiState.Loading)
         private set
 
@@ -49,6 +50,10 @@ class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel
                 PhotoUiState.Error
             }
         }
+    }
+
+    fun updateSearchText(inputText: String) {
+        searchText = inputText
     }
 
     companion object {
