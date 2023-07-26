@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface PhotoApiService {
     @GET("api")
     suspend fun getPhotos(
-        @Query("key") apiKey: String = "38433874-7c8291405628f5642ed3a07ab",
+        @Query("key") apiKey: String = "",
         @Query("q") searchString: String,
     ): PhotoData
 }
