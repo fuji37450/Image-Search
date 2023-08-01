@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PhotoData(
+data class PhotoResponse(
     val total: Int,
     val totalHits: Int,
     val hits: List<Photo>,

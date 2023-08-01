@@ -25,7 +25,8 @@ sealed interface PhotoUiState {
 }
 
 class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel() {
-    /** The mutable State that stores the status of the most recent request */
+    var searchText: String by mutableStateOf("")
+        private set
     var photoUiState: PhotoUiState by mutableStateOf(PhotoUiState.Loading)
         private set
 
@@ -33,10 +34,6 @@ class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel
         photoUiState = PhotoUiState.Init
     }
 
-    /**
-     * Gets photos information from the pixabay API Retrofit service and updates the
-     * [Photo] [List] [MutableList].
-     */
     fun getPhotos(searchString: String) {
         viewModelScope.launch {
             photoUiState = PhotoUiState.Loading
@@ -55,9 +52,10 @@ class PhotoViewModel(private val photosRepository: PhotosRepository) : ViewModel
         }
     }
 
-    /**
-     * Factory for [PhotoViewModel] that takes [PhotosRepository] as a dependency
-     */
+    fun updateSearchText(inputText: String) {
+        searchText = inputText
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

@@ -1,7 +1,6 @@
 package com.example.imagesearch.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.ViewList
@@ -53,14 +53,19 @@ import com.example.imagesearch.model.Photo
 
 
 @Composable
-fun GridScreen(
-    photoUiState: PhotoUiState, modifier: Modifier = Modifier
+fun SearchResultScreen(
+    searchText: String, photoUiState: PhotoUiState, modifier: Modifier = Modifier
 ) {
     when (photoUiState) {
         is PhotoUiState.Init -> InitScreen(modifier = modifier.fillMaxSize())
-        is PhotoUiState.Empty -> EmptyScreen("temp", modifier = modifier.fillMaxSize())
+        is PhotoUiState.Empty -> EmptyScreen(
+            searchText,
+            modifier = modifier.fillMaxSize()
+        )
+
         is PhotoUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is PhotoUiState.Success -> SearchResultScreen(
+        is PhotoUiState.Success -> SuccessScreen(
+            searchText,
             photoUiState.photos,
             modifier = modifier.fillMaxWidth()
         )
@@ -70,13 +75,13 @@ fun GridScreen(
 }
 
 @Composable
-fun SearchResultScreen(photos: List<Photo>, modifier: Modifier) {
+fun SuccessScreen(searchText: String, photos: List<Photo>, modifier: Modifier) {
     Column {
         var isGridMode by remember { mutableStateOf(true) }
-        ResultInfo(
+        SearchResultInfoWithIconToggle(
             isGridMode,
-            onCheckedChange = { modeState -> isGridMode = modeState },
-            searchText = "temp"
+            onCheckedChange = { mode -> isGridMode = mode },
+            searchText = searchText
         )
         if (isGridMode) {
             GridResult(photos = photos, modifier)
@@ -96,7 +101,7 @@ fun GridResult(photos: List<Photo>, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         content = {
             items(photos, key = { photo -> photo.id }) { photo ->
-                PhotoCard(
+                GridCard(
                     photo = photo, modifier = modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
@@ -191,15 +196,18 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.connection_error_img), contentDescription = ""
+        Icon(
+            imageVector = Icons.Filled.CloudOff,
+            contentDescription = stringResource(R.string.cloud_off_icon),
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(80.dp)
         )
-        Text(text = "失敗", modifier = Modifier.padding(16.dp))
+        Text(text = "Some error occurred.", modifier = Modifier.padding(16.dp))
     }
 }
 
 @Composable
-fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
+fun GridCard(photo: Photo, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
@@ -221,7 +229,7 @@ fun PhotoCard(photo: Photo, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ResultInfo(
+fun SearchResultInfoWithIconToggle(
     isGridMode: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     searchText: String,
